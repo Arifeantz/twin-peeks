@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Twin Peeks — Spot the Difference</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">&#9678;</span>
+      <span class="brand-name">TWIN PEEKS</span>
+      <span class="brand-sub">spot the difference</span>
+    </div>
+    <div id="hud" class="hud" hidden>
+      <div class="hud-item hud-level"><span class="hud-label">Level</span><span id="hud-level">1 / 4</span></div>
+      <div class="hud-item hud-found"><span class="hud-label">Found</span><span id="hud-found">0 / 7</span></div>
+      <div class="hud-item hud-timer"><span class="hud-label">Time</span><span id="hud-time">2:00</span>
+        <div class="timer-track"><div id="timer-bar" class="timer-bar"></div></div>
+      </div>
+      <div class="hud-item hud-score"><span class="hud-label">Score</span><span id="hud-score">0</span></div>
+      <div class="hud-item hud-best"><span class="hud-label">Best</span><span id="hud-best">0</span></div>
+    </div>
+    <div class="top-actions">
+      <button id="btn-sound" class="icon-btn" type="button" title="Sound on/off (M)">Sound: On</button>
+      <button id="btn-help" class="icon-btn" type="button" title="How to play">How to play</button>
+    </div>
+  </header>
+
+  <main id="stage">
+    <section id="screen-title" class="screen">
+      <h1>Twin Peeks</h1>
+      <p class="tagline">Two pictures. Seven tiny lies. Find them all before the clock runs out.</p>
+      <div class="difficulty">
+        <p class="difficulty-label">Choose your hunt</p>
+        <div class="difficulty-row">
+          <button class="diff-btn" type="button" data-diff="relaxed">
+            <strong>Relaxed</strong><span>No timer &middot; 3 hints</span>
+          </button>
+          <button class="diff-btn selected" type="button" data-diff="classic">
+            <strong>Classic</strong><span>2:00 &middot; 3 hints</span>
+          </button>
+          <button class="diff-btn" type="button" data-diff="rush">
+            <strong>Rush</strong><span>1:15 &middot; 2 hints</span>
+          </button>
+        </div>
+      </div>
+      <button id="btn-play" class="big-btn" type="button">Start the hunt</button>
+      <div id="level-select" class="level-select"></div>
+      <p class="foot-note">Click a difference on either picture. <kbd>H</kbd> for a hint, <kbd>M</kbd> to mute, <kbd>R</kbd> to restart a level.</p>
+    </section>
+
+    <section id="screen-play" class="screen" hidden>
+      <div class="scene-head">
+        <h2 id="scene-name">The Baker&rsquo;s Morning</h2>
+        <p id="scene-blurb">A warm kitchen, a sleepy cat, and seven things that are not quite the same.</p>
+      </div>
+      <div id="panels">
+        <figure class="panel">
+          <canvas id="panel-left" width="960" height="600" role="img" aria-label="Picture A — find the differences"></canvas>
+          <figcaption>Picture A</figcaption>
+        </figure>
+        <div class="panel-gap" aria-hidden="true"><span>VS</span></div>
+        <figure class="panel">
+          <canvas id="panel-right" width="960" height="600" role="img" aria-label="Picture B — find the differences"></canvas>
+          <figcaption>Picture B</figcaption>
+        </figure>
+      </div>
+      <div class="play-bar">
+        <button id="btn-hint" class="action-btn" type="button">Hint <span id="hint-count">(3 left)</span></button>
+        <button id="btn-restart" class="action-btn" type="button">Restart level</button>
+        <button id="btn-quit" class="action-btn" type="button">Levels</button>
+        <div id="combo" class="combo" hidden></div>
+        <p id="play-message" class="play-message" role="status"></p>
+      </div>
+      <div id="level-progress" class="level-progress"></div>
+    </section>
+
+    <section id="screen-complete" class="screen overlay-screen" hidden>
+      <div class="card">
+        <p class="card-kicker">Level complete</p>
+        <h2 id="complete-title">The Baker&rsquo;s Morning</h2>
+        <div id="complete-stars" class="stars" aria-label="Stars earned"></div>
+        <dl class="score-table">
+          <div><dt>Differences found</dt><dd id="complete-found">7 / 7</dd></div>
+          <div><dt>Time bonus</dt><dd id="complete-time">+0</dd></div>
+          <div><dt>Level score</dt><dd id="complete-score">0</dd></div>
+          <div><dt>Total score</dt><dd id="complete-total">0</dd></div>
+        </dl>
+        <div class="card-actions">
+          <button id="btn-next" class="big-btn" type="button">Next level</button>
+          <button id="btn-replay" class="action-btn" type="button">Replay level</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-timeup" class="screen overlay-screen" hidden>
+      <div class="card">
+        <p class="card-kicker">Out of time</p>
+        <h2>The clock beat you</h2>
+        <p id="timeup-text">You found 3 of 7 differences. The missing ones were so close &mdash; have another look.</p>
+        <div class="card-actions">
+          <button id="btn-retry" class="big-btn" type="button">Try again</button>
+          <button id="btn-timeup-levels" class="action-btn" type="button">Levels</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-campaign" class="screen overlay-screen" hidden>
+      <div class="card">
+        <p class="card-kicker">All four scenes solved</p>
+        <h2>You found every difference!</h2>
+        <div class="stars" aria-label="Campaign complete">&#9733;&#9733;&#9733;</div>
+        <dl class="score-table">
+          <div><dt>Final score</dt><dd id="campaign-score">0</dd></div>
+          <div><dt>Best score</dt><dd id="campaign-best">0</dd></div>
+          <div><dt>Differences found</dt><dd>28 / 28</dd></div>
+        </dl>
+        <p class="card-note">Play again on Rush for a harder hunt &mdash; the pictures hide the same seven lies, but the clock is crueller.</p>
+        <div class="card-actions">
+          <button id="btn-again" class="big-btn" type="button">Play again</button>
+          <button id="btn-campaign-levels" class="action-btn" type="button">Levels</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-help" class="screen overlay-screen" hidden>
+      <div class="card">
+        <p class="card-kicker">How to play</p>
+        <h2>Find the seven differences</h2>
+        <ul class="help-list">
+          <li>Two pictures sit side by side. They look identical &mdash; they are not. Seven small things differ.</li>
+          <li>Click or tap a difference on <strong>either</strong> picture. A golden ring marks it on both.</li>
+          <li>A wrong click costs time and points, so look before you point.</li>
+          <li>Stuck? Press <kbd>H</kbd> or the Hint button &mdash; a ring pulses around a difference you have not found yet.</li>
+          <li>Find them all before the timer ends. Faster finds and streaks earn bonus points.</li>
+          <li>Keys: <kbd>H</kbd> hint &middot; <kbd>M</kbd> sound &middot; <kbd>R</kbd> restart level &middot; <kbd>Esc</kbd> pause.</li>
+        </ul>
+        <div class="card-actions">
+          <button id="btn-help-close" class="big-btn" type="button">Got it</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-pause" class="screen overlay-screen" hidden>
+      <div class="card">
+        <p class="card-kicker">Paused</p>
+        <h2>Take a breath</h2>
+        <p class="card-note">The clock is stopped while you are here.</p>
+        <div class="card-actions">
+          <button id="btn-resume" class="big-btn" type="button">Resume</button>
+          <button id="btn-pause-quit" class="action-btn" type="button">Quit to levels</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="bottombar">
+    <span>An original game &mdash; every picture drawn in code, every sound synthesized live.</span>
+    <span id="foot-progress"></span>
+  </footer>
+</div>
+<script src="src/audio.js"></script>
+<script src="src/scenes.js"></script>
+<script src="src/draw.js"></script>
+<script src="src/input.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>
