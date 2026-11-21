@@ -37,6 +37,7 @@
     timeLimit: null,
     combo: 0,
     lastFindAt: 0,
+    lastProgressAt: 0, // last find, hint or level start — drives the stuck-player hint nudge
     paused: false,
     done: new Set(),
     unlocked: 1,
@@ -135,6 +136,14 @@
       timeLimit: state.timeLimit,
       hintsLeft: state.hintsLeft,
     });
+    // Stuck-player nudge: after 20s without a find, pulse the Hint button
+    // (while a hint is still available) until the player makes progress.
+    var hintBtn = document.getElementById('btn-hint');
+    if (hintBtn) {
+      var stuck = state.screen === 'play' && !state.paused && state.hintsLeft > 0 &&
+        performance.now() - state.lastProgressAt > 20000;
+      hintBtn.classList.toggle('hint-nudge', stuck);
+    }
   }
 
   /* ---------- level flow ---------- */
@@ -152,6 +161,7 @@
     state.timeLeft = diff.timeLimit;
     state.combo = 0;
     state.lastFindAt = 0;
+    state.lastProgressAt = performance.now();
     state.paused = false;
     state.lastTickSecond = -1;
     state.screen = 'play';
@@ -227,6 +237,7 @@
       if (now - state.lastFindAt < 6000) state.combo += 1;
       else state.combo = 1;
       state.lastFindAt = now;
+      state.lastProgressAt = now;
       var bonus = state.combo >= 2 ? 25 * (state.combo - 1) : 0;
       state.score += 100 + bonus;
       SoundFX.found(state.combo);
@@ -267,6 +278,7 @@
     var pick = remaining[Math.floor(Math.random() * remaining.length)];
     state.hintsLeft -= 1;
     state.hintsUsed += 1;
+    state.lastProgressAt = performance.now();
     state.score = Math.max(0, state.score - 50);
     state.hint = { diff: pick, until: performance.now() + 4000 };
     SoundFX.hint();

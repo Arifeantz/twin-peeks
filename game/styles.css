@@ -128,6 +128,16 @@ kbd {
 }
 .action-btn:hover:not(:disabled) { border-color: var(--gold-deep); color: var(--gold-deep); }
 .action-btn:disabled { opacity: 0.45; cursor: default; }
+/* Stuck-player nudge: a soft blue pulse (the hint ring's colour) on the
+   Hint button after 20s without a find. Toggled from main.js pushHud(). */
+@keyframes hint-nudge-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(127, 179, 213, 0.55); }
+  50% { box-shadow: 0 0 0 7px rgba(127, 179, 213, 0); }
+}
+.action-btn.hint-nudge {
+  border-color: #7fb3d5; color: #3d6f96;
+  animation: hint-nudge-pulse 1.6s ease-in-out infinite;
+}
 .combo { font-weight: 800; color: var(--brick); font-size: 15px; }
 .play-message { margin: 0 0 0 auto; color: var(--ink-soft); font-size: 14px; min-height: 20px; }
 .level-progress { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
